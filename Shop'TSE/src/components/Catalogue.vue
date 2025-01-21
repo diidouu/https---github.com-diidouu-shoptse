@@ -5,6 +5,7 @@ import { usePanierStore } from '../stores/panierStore'
 const panier = usePanierStore()
 const categorieSelectionnee = ref('tous')
 const prixMax = ref(3000)
+const message = ref('')
 
 const produitsFiltres = computed(() => {
   let velosFiltres = produits.velos
@@ -29,6 +30,14 @@ const produitsFiltres = computed(() => {
     accessoires: accessoiresFiltres
   }
 })
+
+const ajouterAuPanier = (produit) => {
+  panier.ajouterAuPanier(produit)
+  produit.message = `${produit.nom} a été ajouté au panier !`
+  setTimeout(() => {
+    produit.message = ''
+  }, 3000)
+}
 
 const produits = {
   velos: [
@@ -263,79 +272,88 @@ const produits = {
 </script>
 
 <template>
-  <div class="catalogue">
-    <div class="filtres">
-      <div class="filtre-categorie">
-        <label for="categorie">Catégorie:</label>
-        <select v-model="categorieSelectionnee" id="categorie">
-          <option value="tous">Toutes les catégories</option>
-          <option value="VTT">VTT</option>
-          <option value="Route">Route</option>
-          <option value="Ville">Ville</option>
-          <option value="Gravel">Gravel</option>
-          <option value="Piste">Piste</option>
-          <option value="accessoire">Accessoires</option>
-        </select>
-      </div>
-
-      <div class="filtre-prix">
-        <label for="prix">Prix maximum: {{ prixMax }}€</label>
-        <input 
-          type="range" 
-          id="prix" 
-          v-model="prixMax" 
-          min="0" 
-          max="3000" 
-          step="100"
-        >
-      </div>
+  <div class="catalogue-container">
+    <div class="catalogue-header">
+      <h1>Catalogue</h1>
+      <p>Découvrez notre sélection de vélos et accessoires</p>
     </div>
 
-    <h2>Nos Vélos</h2>
-    <div class="grille-produits">
-      <div v-for="velo in produitsFiltres.velos" :key="velo.id" class="carte-produit">
-        <img :src="velo.image" :alt="velo.nom">
-        <div class="info-produit">
-          <h3>{{ velo.nom }}</h3>
-          <p class="categorie">{{ velo.categorie }}</p>
-          <p class="description">{{ velo.description }}</p>
-          <div class="specifications">
-            <h4>Spécifications:</h4>
-            <ul>
-              <li><strong>Cadre:</strong> {{ velo.specifications.cadre }}</li>
-              <li><strong>Fourche:</strong> {{ velo.specifications.fourche }}</li>
-              <li><strong>Transmission:</strong> {{ velo.specifications.transmission }}</li>
-              <li><strong>Freins:</strong> {{ velo.specifications.freins }}</li>
-            </ul>
-          </div>
-          <p class="prix">{{ velo.prix }} €</p>
-          <button class="ajouter-panier" @click="panier.ajouterAuPanier(velo)">
-            Ajouter au panier
-          </button>
+    <div class="catalogue-content">
+      <div class="filtres">
+        <div class="filtre-categorie">
+          <label for="categorie">Catégorie:</label>
+          <select v-model="categorieSelectionnee" id="categorie">
+            <option value="tous">Toutes les catégories</option>
+            <option value="VTT">VTT</option>
+            <option value="Route">Route</option>
+            <option value="Ville">Ville</option>
+            <option value="Gravel">Gravel</option>
+            <option value="Piste">Piste</option>
+            <option value="accessoire">Accessoires</option>
+          </select>
+        </div>
+
+        <div class="filtre-prix">
+          <label for="prix">Prix maximum: {{ prixMax }}€</label>
+          <input 
+            type="range" 
+            id="prix" 
+            v-model="prixMax" 
+            min="0" 
+            max="3000" 
+            step="100"
+          >
         </div>
       </div>
-    </div>
 
-    <h2>Accessoires</h2>
-    <div class="grille-produits">
-      <div v-for="accessoire in produitsFiltres.accessoires" :key="accessoire.id" class="carte-produit">
-        <img :src="accessoire.image" :alt="accessoire.nom">
-        <div class="info-produit">
-          <h3>{{ accessoire.nom }}</h3>
-          <p class="categorie">{{ accessoire.categorie }}</p>
-          <p class="description">{{ accessoire.description }}</p>
-          <div class="specifications">
-            <h4>Spécifications:</h4>
-            <ul>
-              <li v-for="(value, key) in accessoire.specifications" :key="key">
-                <strong>{{ key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ') }}:</strong> {{ value }}
-              </li>
-            </ul>
+      <div v-if="message" class="confirmation-message">{{ message }}</div>
+
+      <h2>Nos Vélos</h2>
+      <div class="grille-produits">
+        <div v-for="velo in produitsFiltres.velos" :key="velo.id" class="carte-produit">
+          <img :src="velo.image" :alt="velo.nom">
+          <div class="info-produit">
+            <h3>{{ velo.nom }}</h3>
+            <p class="categorie">{{ velo.categorie }}</p>
+            <p class="description">{{ velo.description }}</p>
+            <div class="specifications">
+              <h4>Spécifications:</h4>
+              <ul>
+                <li><strong>Cadre:</strong> {{ velo.specifications.cadre }}</li>
+                <li><strong>Fourche:</strong> {{ velo.specifications.fourche }}</li>
+                <li><strong>Transmission:</strong> {{ velo.specifications.transmission }}</li>
+                <li><strong>Freins:</strong> {{ velo.specifications.freins }}</li>
+              </ul>
+            </div>
+            <p class="prix">{{ velo.prix }} €</p>
+            <button class="ajouter-panier" @click="ajouterAuPanier(velo)">
+              Ajouter au panier
+            </button>
           </div>
-          <p class="prix">{{ accessoire.prix }} €</p>
-          <button class="ajouter-panier" @click="panier.ajouterAuPanier(accessoire)">
-            Ajouter au panier
-          </button>
+        </div>
+      </div>
+
+      <h2>Accessoires</h2>
+      <div class="grille-produits">
+        <div v-for="accessoire in produitsFiltres.accessoires" :key="accessoire.id" class="carte-produit">
+          <img :src="accessoire.image" :alt="accessoire.nom">
+          <div class="info-produit">
+            <h3>{{ accessoire.nom }}</h3>
+            <p class="categorie">{{ accessoire.categorie }}</p>
+            <p class="description">{{ accessoire.description }}</p>
+            <div class="specifications">
+              <h4>Spécifications:</h4>
+              <ul>
+                <li v-for="(value, key) in accessoire.specifications" :key="key">
+                  <strong>{{ key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ') }}:</strong> {{ value }}
+                </li>
+              </ul>
+            </div>
+            <p class="prix">{{ accessoire.prix }} €</p>
+            <button class="ajouter-panier" @click="ajouterAuPanier(accessoire)">
+              Ajouter au panier
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -343,8 +361,52 @@ const produits = {
 </template>
 
 <style scoped>
-.catalogue {
-  padding: 20px;
+.catalogue-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.catalogue-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.catalogue-content {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  padding: 3rem;
+}
+
+.filtres {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.filtre-categorie, .filtre-prix {
+  flex: 1;
+}
+
+.filtre-categorie label, .filtre-prix label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.filtre-categorie select, .filtre-prix input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.filtre-categorie select:focus, .filtre-prix input:focus {
+  border-color: #42b983;
+  outline: none;
 }
 
 .grille-produits {
@@ -358,6 +420,7 @@ const produits = {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 15px;
+  background: white;
   text-align: center;
 }
 
@@ -377,6 +440,7 @@ const produits = {
   font-size: 1.2em;
   color: #2c3e50;
   font-weight: bold;
+  margin: 10px 0;
 }
 
 .ajouter-panier {
@@ -386,6 +450,7 @@ const produits = {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  width: 100%;
   transition: background-color 0.3s;
 }
 
@@ -425,5 +490,15 @@ const produits = {
 .description {
   margin: 10px 0;
   color: #2c3e50;
+}
+
+.confirmation-message {
+  background-color: #42b983;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 20px;
+  transition: opacity 0.3s ease;
 }
 </style>

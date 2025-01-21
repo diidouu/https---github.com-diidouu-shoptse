@@ -1,27 +1,16 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import Navbar from './components/Navbar.vue'
+import Footer from './components/Footer.vue'
 </script>
 
 <template>
-  <header class="site-header">
-    <div class="header-content">
-      <h1>Shop'TSE</h1>
-      <p class="slogan">Votre boutique de vélos de confiance</p>
-      <nav>
-        <router-link to="/">Accueil</router-link> |
-        <router-link to="/catalogue">Catalogue</router-link> |
-        <router-link to="/contact">Contact</router-link> |
-        <router-link to="/recherche">Rechercher</router-link> |
-        <router-link to="/panier">Panier</router-link>
-      </nav>
-    </div>
-  </header>
-
+  <Navbar />
   <main>
     <RouterView />
   </main>
+  <Footer />
 </template>
-
 
 <style scoped>
 .site-header {
@@ -51,5 +40,6 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  padding-bottom: 60px; /* Pour éviter que le contenu ne soit caché par le footer */
 }
 </style>
